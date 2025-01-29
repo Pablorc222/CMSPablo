@@ -171,7 +171,7 @@ fi
 
 
 
-###2.3 Script de Servidores Webs(`webs.sh`)
+###2.2 Script de Servidores Webs(`webs.sh`)
 #!/bin/bash
 
 # Actualizar repositorios e instalar nginx, nfs-common y PHP 7.4
@@ -232,7 +232,7 @@ sudo systemctl restart nginx
 
 
 
-###2.4 Script de Servidor NFS(`nfs.sh`)
+###2.3 Script de Servidor NFS(`nfs.sh`)
 #!/bin/bash
 
 # Actualizar repositorios e instalar NFS y PHP 7.4
