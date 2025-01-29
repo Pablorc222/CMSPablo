@@ -81,9 +81,10 @@ Vagrant.configure("2") do |config|
   end
 end
 
-## Instalación y Configuración
 
-### 1. Script de Balanceador de Carga (`balanceador.sh`)
+
+
+###2. Script de Balanceador de Carga (`balanceador.sh`)
 
 Este script configura **nginx** como balanceador de carga, distribuyendo el tráfico entre los servidores web.
 
@@ -132,4 +133,124 @@ nginx -t
 # Habilitar y reiniciar Nginx
 sudo systemctl enable nginx
 sudo systemctl restart nginx
+
+
+
+
+
+###2.1 Script de Base de Datos (`BDD.sh`)
+#!/bin/bash
+
+# Actualizar repositorios e instalar MariaDB
+sudo apt-get update -y
+sudo apt-get install -y mariadb-server
+
+# Configurar MariaDB para permitir acceso remoto desde los servidores web
+sed -i 's/bind-address.*/bind-address = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+
+# Reiniciar el servicio de MariaDB
+sudo systemctl restart mariadb
+
+# Crear base de datos y usuario en MariaDB con permisos remotos
+mysql -u root <<EOF
+CREATE DATABASE owncloud;
+CREATE USER 'owncloud'@'%' IDENTIFIED BY '1234';
+GRANT ALL PRIVILEGES ON owncloud.* TO 'owncloud'@'%';
+FLUSH PRIVILEGES;
+EOF
+
+# Habilitar MariaDB en el arranque
+sudo systemctl enable mariadb
+
+# Corregir posibles errores de red eliminando rutas por defecto incorrectas
+if ip route | grep -q "default"; then
+  sudo ip route del default
+fi
+
+
+
+
+
+###2.3 Script de Servidores Webs(`webs.sh`)
+#!/bin/bash
+
+# Actualizar repositorios e instalar nginx, nfs-common y PHP 7.4
+sudo apt-get update -y
+sudo apt-get install -y nginx nfs-common php7.4 php7.4-fpm php7.4-mysql php7.4-gd php7.4-xml php7.4-mbstring php7.4-curl php7.4-zip php7.4-intl php7.4-ldap mariadb-client
+
+# Asegurarse de que el servicio nfs-common no esté enmascarado
+sudo systemctl unmask nfs-common
+sudo systemctl enable nfs-common
+sudo systemctl start nfs-common
+
+# Crear directorio para montar la carpeta compartida por NFS
+sudo mkdir -p /var/www/html
+
+# Montar la carpeta NFS desde el servidor NFS
+sudo mount -t nfs 192.168.56.11:/var/www/html /var/www/html
+
+# Verificar que el montaje fue exitoso
+if mountpoint -q /var/www/html; then
+    echo "Montaje NFS exitoso en /var/www/html"
+else
+    echo "Error: No se pudo montar NFS en /var/www/html" >&2
+    exit 1
+fi
+
+# Configuración de Nginx para OwnCloud
+cat <<EOF | sudo tee /etc/nginx/sites-available/default
+server {
+    listen 80;
+
+    root /var/www/html/owncloud;
+    index index.php index.html index.htm;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php\$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass 192.168.56.11:9000;  # IP del servidor PHP-FPM
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ ^/(?:\.htaccess|data|config|db_structure\.xml|README) {
+        deny all;
+    }
+}
+EOF
+
+# Verificar configuración de Nginx antes de reiniciar
+sudo nginx -t
+
+# Reiniciar nginx
+sudo systemctl restart nginx
+
+
+
+
+
+###2.4 Script de Servidor NFS(`nfs.sh`)
+#!/bin/bash
+
+# Actualizar repositorios e instalar NFS y PHP 7.4
+sudo apt-get update -y
+sudo apt-get install -y nfs-kernel-server php7.4 php7.4-fpm php7.4-mysql php7.4-gd php7.4-xml php7.4-mbstring php7.4-curl php7.4-zip php7.4-intl php7.4-ldap unzip
+
+# Crear carpeta compartida para OwnCloud
+sudo mkdir -p /var/www/html
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+
+# Configurar NFS para compartir la carpeta
+echo "/var/www/html 192.168.56.12(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+echo "/var/www/html 192.168.56.13(rw,sync,no_subtree_check)" | sudo tee -a /etc/exports
+
+# Aplicar configuración de exportaciones
+sudo exportfs -a
+sudo systemctl restart nfs-kernel-server
+
+
 
