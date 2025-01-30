@@ -29,7 +29,7 @@ La infraestructura consta de los siguientes componentes:
 
 ### 1. Vagrantfile
 
-Este archivo configura las máquinas virtuales utilizando **Vagrant** y **VirtualBox**. Crea las máquinas con las direcciones IP privadas mencionadas anteriormente y define los scripts de provisión para cada máquina.
+Este archivo configura las máquinas virtuales utilizando **Vagrant** y **VirtualBox**. Creamos las máquinas con las direcciones IP privadas mencionadas anteriormente y definimos los scripts de aprovisionamiento para cada máquina.
 
 ```ruby
 Vagrant.configure("2") do |config|
