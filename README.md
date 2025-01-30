@@ -244,6 +244,75 @@ echo "/var/www/html 192.168.56.13(rw,sync,no_subtree_check)" | sudo tee -a /etc/
 # Aplicar configuración de exportaciones
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
+# Reiniciar NFS para aplicar cambios
+sudo systemctl restart nfs-kernel-server
+
+# Descargar y configurar OwnCloud
+cd /tmp
+wget https://download.owncloud.com/server/stable/owncloud-10.9.1.zip
+unzip owncloud-10.9.1.zip
+mv owncloud /var/www/html/
+
+# Asegurar que el directorio de configuración de OwnCloud existe
+sudo mkdir -p /var/www/html/owncloud/config
+
+# Configurar permisos de OwnCloud
+sudo chown -R www-data:www-data /var/www/html/owncloud
+sudo chmod -R 755 /var/www/html/owncloud
+
+# Crear archivo de configuración inicial para OwnCloud
+cat <<EOF > /var/www/html/owncloud/config/autoconfig.php
+<?php
+\$AUTOCONFIG = array(
+  "dbtype" => "mysql",
+  "dbname" => "owncloud",
+  "dbuser" => "owncloud",
+  "dbpassword" => "1234",
+  "dbhost" => "192.168.56.10", # Dirección IP del servidor SGBD
+  "directory" => "/var/www/html/owncloud/data",
+  "adminlogin" => "PabloR",
+  "adminpass" => "1234"
+);
+EOF
+
+# Verificar si config.php existe antes de modificarlo
+CONFIG_FILE="/var/www/html/owncloud/config/config.php"
+if [ ! -f "$CONFIG_FILE" ]; then
+    echo "Creando archivo config.php de OwnCloud..."
+    sudo -u www-data touch "$CONFIG_FILE"
+    echo "<?php return array(); ?>" | sudo tee "$CONFIG_FILE"
+fi
+
+# Añadir dominios de confianza a la configuración de OwnCloud
+php -r "
+  \$configFile = '$CONFIG_FILE';
+  if (file_exists(\$configFile)) {
+    \$config = include(\$configFile);
+    \$config['trusted_domains'] = array(
+      'localhost',
+      'localhost:8080',
+      '192.168.56.10',
+      '192.168.56.11',
+      '192.168.56.12',
+    );
+    file_put_contents(\$configFile, '<?php return ' . var_export(\$config, true) . ';');
+  } else {
+    echo 'No se pudo encontrar el archivo config.php';
+  }
+"
+# Aplicar permisos correctos a la configuración
+sudo chown -R www-data:www-data /var/www/html/owncloud/config
+
+# Configurar PHP-FPM para que escuche en la IP del servidor NFS
+sed -i 's/^listen = .*/listen = 192.168.56.11:9000/' /etc/php/7.4/fpm/pool.d/www.conf
+
+# Reiniciar servicios para aplicar cambios
+sudo systemctl restart php7.4-fpm
+
+# Asegurarse de que el servicio NFS está funcionando correctamente
+sudo systemctl status nfs-kernel-server
+
+
 ```
 
 ### Aquí tenemos el vídeo final con todas las indicaciones realizadas. [CMSPabloR](https://www.youtube.com/watch?v=ZHC0eemAkxw)
