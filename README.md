@@ -245,7 +245,7 @@ echo "/var/www/html 192.168.56.13(rw,sync,no_subtree_check)" | sudo tee -a /etc/
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
 ```
-[![Aquí tenemos el vídeo final con todas las indicaciones realizadas][(https://img.youtube.com/vi/VIDEO_ID/0.jpg)](https://www.youtube.com/watch?v=VIDEO_ID)](https://www.youtube.com/watch?v=ZHC0eemAkxw)
+[[Aquí tenemos el vídeo final con todas las indicaciones realizadas][(https://img.youtube.com/vi/VIDEO_ID/0.jpg)]
 
 
 
