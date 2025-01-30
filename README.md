@@ -135,8 +135,7 @@ sudo systemctl restart nginx
 
 ```
 
-
-
+```ruby
 ###2.1 Script de Base de Datos (`BDD.sh`)
 #!/bin/bash
 
@@ -165,11 +164,7 @@ sudo systemctl enable mariadb
 if ip route | grep -q "default"; then
   sudo ip route del default
 fi
-
-
-
-
-
+```
 ###2.2 Script de Servidores Webs(`webs.sh`)
 #!/bin/bash
 
@@ -227,10 +222,8 @@ sudo nginx -t
 # Reiniciar nginx
 sudo systemctl restart nginx
 
-
-
-
-
+```
+```ruby
 ###2.3 Script de Servidor NFS(`nfs.sh`)
 #!/bin/bash
 
@@ -250,6 +243,6 @@ echo "/var/www/html 192.168.56.13(rw,sync,no_subtree_check)" | sudo tee -a /etc/
 # Aplicar configuración de exportaciones
 sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
-
+```
 
 
