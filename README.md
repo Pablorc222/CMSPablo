@@ -316,5 +316,5 @@ sudo systemctl status nfs-kernel-server
 ```
 
 ### Aquí tenemos el vídeo final con todas las indicaciones realizadas. [CMSPabloR](https://www.youtube.com/watch?v=ZHC0eemAkxw)
-### Aquí tenemos el enunciado 4.Acceso a servidor MariaDB desde las máquinas serverweb1 y serverweb2. EMpieza en el 00:14 [CMSPabloR(2)](https://youtu.be/0tKK9H3GNNM)
+### Aquí tenemos el enunciado 4.Acceso a servidor MariaDB desde las máquinas serverweb1 y serverweb2. Empieza en el 00:14 [CMSPabloR(2)](https://youtu.be/0tKK9H3GNNM)
 
