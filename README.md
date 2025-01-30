@@ -81,8 +81,7 @@ Vagrant.configure("2") do |config|
   end
 end
 
-
-
+```
 
 ###2. Script de Balanceador de Carga (`balanceador.sh`)
 
