@@ -246,5 +246,5 @@ sudo exportfs -a
 sudo systemctl restart nfs-kernel-server
 ```
 
- Aquí tenemos el vídeo final con todas las indicaciones realizadas.[YouTube](https://www.youtube.com/watch?v=ZHC0eemAkxw)
+ Aquí tenemos el vídeo final con todas las indicaciones realizadas. [CMSPabloR](https://www.youtube.com/watch?v=ZHC0eemAkxw)
 
