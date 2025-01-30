@@ -82,7 +82,7 @@ Vagrant.configure("2") do |config|
 end
 
 ```
-
+```ruby
 ###2. Script de Balanceador de Carga (`balanceador.sh`)
 
 Este script configura **nginx** como balanceador de carga, distribuyendo el tráfico entre los servidores web.
@@ -133,7 +133,7 @@ nginx -t
 sudo systemctl enable nginx
 sudo systemctl restart nginx
 
-
+```
 
 
 
