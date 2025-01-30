@@ -165,6 +165,7 @@ if ip route | grep -q "default"; then
   sudo ip route del default
 fi
 ```
+```ruby
 ###2.2 Script de Servidores Webs(`webs.sh`)
 #!/bin/bash
 
